@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bookyy - Paginas leidas en el año</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ambient-shape shape-a"></div>
+    <div class="ambient-shape shape-b"></div>
+
+    <header class="topbar">
+      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menu">☰</button>
+      <p class="topbar-title">Bookyy</p>
+    </header>
+
+    <aside id="navDrawer" class="nav-drawer" aria-hidden="true">
+      <div class="drawer-head">
+        <p>Menu</p>
+        <button id="menuClose" class="drawer-close" type="button" aria-label="Cerrar menu">✕</button>
+      </div>
+      <nav class="drawer-nav">
+        <button type="button" class="drawer-link is-active" data-view="home">Inicio</button>
+        <button type="button" class="drawer-link" data-view="books">Mis libros</button>
+      </nav>
+    </aside>
+    <div id="drawerBackdrop" class="drawer-backdrop"></div>
+
+    <main class="layout">
+      <section id="homeView" class="app-view">
+        <section class="hero card reveal">
+          <p class="eyebrow">Bookyy</p>
+          <h1>Tu marcador anual de paginas leidas</h1>
+          <p class="reading-era">Reading Era✨</p>
+        </section>
+
+        <div class="workspace-grid">
+          <section class="main-column">
+            <section class="summary card reveal delay-1">
+              <div>
+                <p class="muted">Año</p>
+                <select id="yearSelect" aria-label="Seleccionar año"></select>
+              </div>
+              <div>
+                <p class="muted">Paginas totales</p>
+                <p id="totalPages" class="metric">0</p>
+              </div>
+              <div>
+                <p class="muted">Libros terminados</p>
+                <p id="bookCount" class="metric">0</p>
+              </div>
+            </section>
+
+            <section class="card reveal delay-2">
+              <h2>Registrar libro terminado</h2>
+              <p class="muted">Tus datos se guardan en este navegador.</p>
+              <form id="bookForm" class="book-form" autocomplete="off">
+                <label class="suggestion-field">
+                  Titulo
+                  <div class="suggestion-shell">
+                    <input
+                      id="titleInput"
+                      name="title"
+                      autocomplete="off"
+                      required
+                      placeholder="Ej: El nombre de la rosa"
+                      aria-autocomplete="list"
+                      aria-expanded="false"
+                      aria-controls="titleSuggestions"
+                    />
+                    <ul id="titleSuggestions" class="suggestion-list" role="listbox"></ul>
+                  </div>
+                  <small class="hint">Te recomendamos libros mientras escribes.</small>
+                </label>
+
+                <label>
+                  Autor (opcional)
+                  <input
+                    id="authorInput"
+                    name="author"
+                    autocomplete="off"
+                    placeholder="Ej: Umberto Eco"
+                  />
+                </label>
+
+                <label>
+                  Fecha de finalizacion
+                  <input id="finishedAtInput" name="finishedAt" type="date" required />
+                </label>
+
+                <label>
+                  Paginas (solo si no se encuentran automatico)
+                  <input
+                    id="manualPagesInput"
+                    name="manualPages"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="Ej: 320"
+                  />
+                </label>
+
+                <button type="submit">Guardar libro</button>
+                <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <section class="card reveal delay-3">
+              <div class="list-header">
+                <h2>Recomendados para ti</h2>
+                <p class="muted">Basados en los libros que ya cargaste</p>
+              </div>
+              <ul id="recommendationList" class="recommendation-list"></ul>
+            </section>
+          </section>
+        </div>
+      </section>
+
+      <section id="booksView" class="app-view is-hidden">
+        <section class="card reveal delay-1">
+          <div class="list-header">
+            <h2>Mis libros</h2>
+            <p class="muted">Ordenados por fecha de finalizacion</p>
+          </div>
+          <ul id="bookList" class="book-list"></ul>
+        </section>
+      </section>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

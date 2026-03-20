@@ -1,0 +1,113 @@
+{
+  "byClient": {
+    "legacy": [
+      {
+        "id": "d0c80bc9-f1f0-49f6-9c4b-596827499351",
+        "title": "Harry Potter",
+        "author": "J.K. Rowling",
+        "pages": 4245,
+        "year": 2026,
+        "finishedAt": "2026-03-19T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "Harry Potter: La Colección Completa (1-7)"
+        },
+        "createdAt": "2026-03-19T19:53:37.677Z"
+      },
+      {
+        "id": "6b83944f-9df5-4c2d-bb63-4ca09c186fcb",
+        "title": "harry potter y la piedra filosofal",
+        "author": "J. K. Rowling",
+        "pages": 264,
+        "year": 2026,
+        "finishedAt": "2026-03-19T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "Harry Potter y la piedra filosofal"
+        },
+        "createdAt": "2026-03-19T19:54:19.647Z"
+      }
+    ],
+    "cliente-a": [],
+    "a8072cf0-2252-40ce-9a74-37dda35d575b": [
+      {
+        "id": "d76bac64-524d-4d1e-938a-a51241dca398",
+        "title": "La vida invisible de Addie LaRue (Avance)",
+        "author": "V.E. SCHWAB",
+        "pages": 547,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "La vida invisible de Addie LaRue (Avance)"
+        },
+        "createdAt": "2026-03-20T12:25:24.073Z"
+      },
+      {
+        "id": "2287245a-16db-4eea-9c83-aa7682e9e65c",
+        "title": "La vida invisible de Addie LaRue (Avance)",
+        "author": "V.E. SCHWAB",
+        "pages": 547,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "La vida invisible de Addie LaRue (Avance)"
+        },
+        "createdAt": "2026-03-20T12:30:46.925Z"
+      },
+      {
+        "id": "a16ddc47-3723-4107-9177-df09f568d11a",
+        "title": "La Dama de las Camelias",
+        "author": "Alejandro Dumas",
+        "pages": 330,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "La Dama de las Camelias"
+        },
+        "createdAt": "2026-03-20T12:38:15.289Z"
+      },
+      {
+        "id": "05e98a23-c72e-4d44-bfd6-4cba806818e1",
+        "title": "Una obsesión perversa",
+        "author": "V. E. SCHWAB",
+        "pages": 366,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "Una obsesión perversa"
+        },
+        "createdAt": "2026-03-20T12:44:28.249Z"
+      },
+      {
+        "id": "e297d208-7495-418f-bc63-9fd7b38f765f",
+        "title": "Percy Jackson y los dioses griegos (Percy Jackson)",
+        "author": "Rick Riordan",
+        "pages": 329,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "Percy Jackson y los dioses griegos (Percy Jackson)"
+        },
+        "createdAt": "2026-03-20T12:48:40.218Z"
+      },
+      {
+        "id": "ab3b059f-2a0e-4d83-8aef-1490a1b3f2d0",
+        "title": "Platero y yo",
+        "author": "Juan Ramón Jiménez",
+        "pages": 87,
+        "year": 2026,
+        "finishedAt": "2026-03-20T00:00:00.000Z",
+        "source": {
+          "provider": "Google Books",
+          "matchedTitle": "Platero y yo"
+        },
+        "createdAt": "2026-03-20T13:04:07.443Z"
+      }
+    ]
+  }
+}
