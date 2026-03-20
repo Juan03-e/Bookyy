@@ -93,6 +93,9 @@ const clientId = getOrCreateClientId();
 let suggestionTimer;
 let currentSuggestions = [];
 let activeSuggestionIndex = -1;
+let suggestionController = null;
+const suggestionCache = new Map();
+const SUGGESTION_CACHE_TTL_MS = 1000 * 60 * 5;
 
 function normalizeText(value) {
   return (value || '').trim();
@@ -414,13 +417,13 @@ async function fetchBookPages({ title, author }) {
   throw new Error(`No se encontraron paginas automaticamente. ${errors.join(' ')}`);
 }
 
-async function fetchOpenLibrarySuggestions(query, mode = 'title') {
+async function fetchOpenLibrarySuggestions(query, mode = 'title', signal) {
   const params = new URLSearchParams({
     limit: '8',
   });
   params.set(mode, query);
 
-  const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
+  const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`, { signal });
   if (!response.ok) {
     throw new Error(`Open Library respondio ${response.status}.`);
   }
@@ -438,14 +441,16 @@ async function fetchOpenLibrarySuggestions(query, mode = 'title') {
   }));
 }
 
-async function fetchGoogleSuggestions(query) {
+async function fetchGoogleSuggestions(query, signal) {
   const params = new URLSearchParams({
     q: query,
     maxResults: '8',
     printType: 'books',
   });
 
-  const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params.toString()}`);
+  const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params.toString()}`, {
+    signal,
+  });
   if (!response.ok) {
     throw new Error(`Google Books respondio ${response.status}.`);
   }
@@ -465,32 +470,48 @@ async function fetchGoogleSuggestions(query) {
   }));
 }
 
-async function fetchSuggestions(query) {
+function getCachedSuggestions(query) {
+  const key = normalizeKey(query);
+  const cached = suggestionCache.get(key);
+
+  if (!cached) {
+    return null;
+  }
+
+  if (Date.now() - cached.createdAt > SUGGESTION_CACHE_TTL_MS) {
+    suggestionCache.delete(key);
+    return null;
+  }
+
+  return cached.items;
+}
+
+function setCachedSuggestions(query, items) {
+  const key = normalizeKey(query);
+  suggestionCache.set(key, {
+    items,
+    createdAt: Date.now(),
+  });
+}
+
+async function fetchSuggestions(query, signal) {
+  const cached = getCachedSuggestions(query);
+  if (cached) {
+    return cached;
+  }
+
   const queryTokens = getMeaningfulTokens(query);
   const normalizedQuery = normalizeKey(query);
-  const batches = [];
+  const batches = await Promise.allSettled([
+    fetchOpenLibrarySuggestions(query, 'title', signal),
+    fetchOpenLibrarySuggestions(query, 'q', signal),
+    fetchGoogleSuggestions(query, signal),
+  ]);
 
-  try {
-    batches.push(await fetchOpenLibrarySuggestions(query, 'title'));
-  } catch {
-    batches.push([]);
-  }
-
-  try {
-    batches.push(await fetchOpenLibrarySuggestions(query, 'q'));
-  } catch {
-    batches.push([]);
-  }
-
-  try {
-    batches.push(await fetchGoogleSuggestions(query));
-  } catch {
-    batches.push([]);
-  }
+  const allItems = batches.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
 
   const ranked = uniqueBy(
-    batches
-      .flat()
+    allItems
       .filter((item) => item.title)
       .filter((item) => !isNoisyCandidate(item, { strict: true }))
       .map((item) => ({
@@ -523,12 +544,15 @@ async function fetchSuggestions(query) {
     (item) => `${normalizeKey(item.title)}::${normalizeKey(item.author)}`
   );
 
-  return ranked.slice(0, 6).map((item) => ({
+  const top = ranked.slice(0, 6).map((item) => ({
     title: item.title,
     author: item.author,
     pages: item.pages,
     source: item.source,
   }));
+
+  setCachedSuggestions(query, top);
+  return top;
 }
 
 async function searchOpenLibrary(params) {
@@ -941,6 +965,11 @@ function applySuggestion(index) {
 
 function onTitleInput() {
   clearTimeout(suggestionTimer);
+
+  if (suggestionController) {
+    suggestionController.abort();
+  }
+
   const query = titleInput.value.trim();
 
   if (query.length < 2) {
@@ -948,14 +977,23 @@ function onTitleInput() {
     return;
   }
 
+  const requestQuery = query;
+  suggestionController = new AbortController();
+
   suggestionTimer = setTimeout(async () => {
     try {
-      const suggestions = await fetchSuggestions(query);
+      const suggestions = await fetchSuggestions(requestQuery, suggestionController.signal);
+      if (titleInput.value.trim() !== requestQuery) {
+        return;
+      }
       renderSuggestions(suggestions);
-    } catch {
+    } catch (error) {
+      if (error && error.name === 'AbortError') {
+        return;
+      }
       renderSuggestions([]);
     }
-  }, 240);
+  }, 160);
 }
 
 function onTitleKeyDown(event) {
