@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bookyy icon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffdbe9"/>
+      <stop offset="1" stop-color="#ffc6dc"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#fff4f9"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="4" width="56" height="56" rx="16" fill="url(#bg)"/>
+  <rect x="16" y="16" width="32" height="32" rx="8" fill="url(#book)" stroke="#e88caf" stroke-width="2"/>
+  <path d="M32 16v32" stroke="#e88caf" stroke-width="2"/>
+  <path d="M22 23h7M22 29h7M35 23h7M35 29h7" stroke="#f2aac4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="48" cy="48" r="8" fill="#e85b87"/>
+  <path d="M48 44.8l1.3 2.6 2.9.4-2.1 2 0.5 2.9-2.6-1.4-2.6 1.4 0.5-2.9-2.1-2 2.9-.4z" fill="#fff6fa"/>
+</svg>
