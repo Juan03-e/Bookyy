@@ -155,7 +155,7 @@ function parseManualPages(value) {
 
   const pages = Number(value);
   if (!Number.isInteger(pages) || pages <= 0 || pages > 20000) {
-    throw new Error('Las paginas manuales no son validas.');
+    throw new Error('Las páginas manuales no son válidas.');
   }
 
   return pages;
@@ -168,7 +168,7 @@ function parseYear(value) {
 
   const numericYear = Number(value);
   if (!Number.isInteger(numericYear) || numericYear < 1900 || numericYear > 3000) {
-    throw new Error('El año no es valido.');
+    throw new Error('El año no es válido.');
   }
 
   return numericYear;
@@ -332,7 +332,7 @@ async function fetchFromOpenLibrary({ title, author }) {
 
   const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Open Library respondio ${response.status}.`);
+    throw new Error(`Open Library respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -340,7 +340,7 @@ async function fetchFromOpenLibrary({ title, author }) {
   const withPages = docs.filter((doc) => Number.isFinite(doc.number_of_pages_median));
 
   if (withPages.length === 0) {
-    throw new Error('Open Library no devolvio paginas.');
+    throw new Error('Open Library no devolvió páginas.');
   }
 
   const sorted = withPages.sort((a, b) => {
@@ -375,7 +375,7 @@ async function fetchFromGoogleBooks({ title, author }) {
 
   const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Google Books respondio ${response.status}.`);
+    throw new Error(`Google Books respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -383,7 +383,7 @@ async function fetchFromGoogleBooks({ title, author }) {
   const withPages = items.filter((item) => Number.isFinite(item.volumeInfo?.pageCount));
 
   if (withPages.length === 0) {
-    throw new Error('Google Books no devolvio paginas.');
+    throw new Error('Google Books no devolvió páginas.');
   }
 
   const sorted = withPages.sort((a, b) => {
@@ -418,7 +418,7 @@ async function fetchBookPages({ title, author }) {
     }
   }
 
-  throw new Error(`No se encontraron paginas automaticamente. ${errors.join(' ')}`);
+  throw new Error(`No se encontraron páginas automáticamente. ${errors.join(' ')}`);
 }
 
 async function fetchOpenLibrarySuggestions(query, mode = 'title', signal) {
@@ -429,7 +429,7 @@ async function fetchOpenLibrarySuggestions(query, mode = 'title', signal) {
 
   const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`, { signal });
   if (!response.ok) {
-    throw new Error(`Open Library respondio ${response.status}.`);
+    throw new Error(`Open Library respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -456,7 +456,7 @@ async function fetchGoogleSuggestions(query, signal) {
     signal,
   });
   if (!response.ok) {
-    throw new Error(`Google Books respondio ${response.status}.`);
+    throw new Error(`Google Books respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -568,7 +568,7 @@ async function searchOpenLibrary(params) {
   const response = await fetch(`https://openlibrary.org/search.json?${params.toString()}`);
 
   if (!response.ok) {
-    throw new Error(`Open Library respondio ${response.status}.`);
+    throw new Error(`Open Library respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -584,7 +584,7 @@ async function searchGoogleVolumes(query, maxResults = 12) {
 
   const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Google Books respondio ${response.status}.`);
+    throw new Error(`Google Books respondió ${response.status}.`);
   }
 
   const payload = await response.json();
@@ -795,11 +795,11 @@ async function fetchRecommendations() {
 
       let reason = 'Se parece a lo que vienes leyendo.';
       if (subjectHits.length > 0) {
-        reason = `Coincide por genero o tema: ${subjectHits.slice(0, 2).join(', ')}`;
+        reason = `Coincide por género o tema: ${subjectHits.slice(0, 2).join(', ')}`;
       } else if (keywordHits.length > 0) {
         reason = `Tiene una vibra parecida a tus lecturas: ${keywordHits.slice(0, 3).join(', ')}`;
       } else if (authorMatch > 0) {
-        reason = `Tambien puede gustarte por cercania con ${item.author}`;
+        reason = `También puede gustarte por cercanía con ${item.author}`;
       }
 
       return {
@@ -878,7 +878,7 @@ function setView(view) {
     try {
       renderDashboardView(Number(yearSelect.value));
     } catch {
-      setMessage('No se pudo abrir el dashboard. Recarga la pagina.', true);
+      setMessage('No se pudo abrir el dashboard. Recarga la página.', true);
     }
   }
 
@@ -945,7 +945,7 @@ function renderSuggestions(suggestions) {
       metaParts.push(suggestion.author);
     }
     if (suggestion.pages) {
-      metaParts.push(`${suggestion.pages} paginas`);
+      metaParts.push(`${suggestion.pages} páginas`);
     }
     if (suggestion.source) {
       metaParts.push(suggestion.source);
@@ -1073,7 +1073,7 @@ function deleteBook(bookId) {
   const next = books.filter((book) => book.id !== bookId);
 
   if (next.length === books.length) {
-    throw new Error('No se encontro el libro para borrar.');
+    throw new Error('No se encontró el libro para borrar.');
   }
 
   store.byClient[clientId] = next;
@@ -1094,7 +1094,7 @@ function renderBooks(books) {
   if (orderedBooks.length === 0) {
     const empty = document.createElement('li');
     empty.className = 'empty-state';
-    empty.textContent = 'Todavia no registraste libros para este año.';
+    empty.textContent = 'Todavía no registraste libros para este año.';
     bookList.append(empty);
     return;
   }
@@ -1111,7 +1111,7 @@ function renderBooks(books) {
 
     const pages = document.createElement('p');
     pages.className = 'book-pages';
-    pages.textContent = `${book.pages} paginas`;
+    pages.textContent = `${book.pages} páginas`;
 
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
@@ -1156,10 +1156,10 @@ function renderRecommendations(recommendations) {
     const meta = document.createElement('p');
     const bits = [];
     if (recommendation.firstPublishYear) {
-      bits.push(`Primera edicion: ${recommendation.firstPublishYear}`);
+      bits.push(`Primera edición: ${recommendation.firstPublishYear}`);
     }
     if (recommendation.pages) {
-      bits.push(`${recommendation.pages} paginas aprox.`);
+      bits.push(`${recommendation.pages} páginas aprox.`);
     }
     if (Array.isArray(recommendation.subjects) && recommendation.subjects.length > 0) {
       bits.push(`Temas: ${recommendation.subjects.join(', ')}`);
@@ -1217,7 +1217,7 @@ function renderLineAreaChart(container, values, { lineColor, fillColor, valueSuf
   const svg = createSvgNode('svg', {
     viewBox: `0 0 ${width} ${height}`,
     role: 'img',
-    'aria-label': 'Grafico de lineas mensual',
+    'aria-label': 'Gráfico de líneas mensual',
     preserveAspectRatio: 'none',
   });
 
@@ -1342,7 +1342,7 @@ function renderBarChart(container, values, { barStart, barEnd, valueSuffix }) {
   const svg = createSvgNode('svg', {
     viewBox: `0 0 ${width} ${height}`,
     role: 'img',
-    'aria-label': 'Grafico de barras mensual',
+    'aria-label': 'Gráfico de barras mensual',
     preserveAspectRatio: 'none',
   });
 
@@ -1475,7 +1475,7 @@ function renderDashboardView(year = Number(yearSelect.value)) {
   renderLineAreaChart(pagesByMonthChart, monthlyPages, {
     lineColor: '#de4a7d',
     fillColor: '#f49dbc',
-    valueSuffix: ' pags',
+    valueSuffix: ' páginas',
   });
   renderBarChart(booksByMonthChart, monthlyBooks, {
     barStart: '#f08fb0',
@@ -1500,15 +1500,15 @@ function renderDashboardView(year = Number(yearSelect.value)) {
   renderDashboardList(
     topAuthorsList,
     topAuthors,
-    'Aun no hay datos para mostrar autores.',
+    'Aún no hay datos para mostrar autores.',
     (value) => `${value} libro${value === 1 ? '' : 's'}`
   );
 
   renderDashboardList(
     longestBooksList,
     longestBooks,
-    'Aun no hay libros para mostrar.',
-    (value) => `${value} pags`
+    'Aún no hay libros para mostrar.',
+    (value) => `${value} páginas`
   );
 }
 
@@ -1561,7 +1561,7 @@ function saveBook(book) {
 
 async function submitBook(event) {
   event.preventDefault();
-  setMessage('Buscando paginas y guardando en este navegador...');
+  setMessage('Buscando páginas y guardando en este navegador...');
 
   try {
     const title = normalizeText(titleInput.value);
@@ -1570,11 +1570,11 @@ async function submitBook(event) {
     const manualPages = parseManualPages(manualPagesInput.value);
 
     if (!title) {
-      throw new Error('Debes ingresar el titulo del libro.');
+      throw new Error('Debes ingresar el título del libro.');
     }
 
     if (Number.isNaN(finishedAt.getTime())) {
-      throw new Error('La fecha de finalizacion no es valida.');
+      throw new Error('La fecha de finalización no es válida.');
     }
 
     const year = parseYear(yearSelect.value || finishedAt.getFullYear());
@@ -1614,7 +1614,7 @@ async function submitBook(event) {
 
     saveBook(newBook);
 
-    setMessage(`Listo: ${newBook.title} sumo ${newBook.pages} paginas (${newBook.source.provider}).`);
+    setMessage(`Listo: ${newBook.title} sumó ${newBook.pages} páginas (${newBook.source.provider}).`);
     bookForm.reset();
     finishedAtInput.value = new Date().toISOString().slice(0, 10);
     closeSuggestions();

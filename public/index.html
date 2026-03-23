@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bookyy - Paginas leidas en el año</title>
+    <title>Bookyy - Páginas leídas en el año</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -27,14 +27,14 @@
     <div class="ambient-shape shape-b"></div>
 
     <header class="topbar">
-      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menu">☰</button>
+      <button id="menuToggle" class="menu-toggle" type="button" aria-label="Abrir menú">☰</button>
       <p class="topbar-title">Bookyy</p>
     </header>
 
     <aside id="navDrawer" class="nav-drawer" aria-hidden="true">
       <div class="drawer-head">
-        <p>Menu</p>
-        <button id="menuClose" class="drawer-close" type="button" aria-label="Cerrar menu">✕</button>
+        <p>Menú</p>
+        <button id="menuClose" class="drawer-close" type="button" aria-label="Cerrar menú">✕</button>
       </div>
       <nav class="drawer-nav">
         <button type="button" class="drawer-link is-active" data-view="home">Inicio</button>
@@ -48,7 +48,7 @@
       <section id="homeView" class="app-view">
         <section class="hero card reveal">
           <p class="eyebrow">Bookyy</p>
-          <h1>Tu marcador anual de paginas leidas</h1>
+          <h1>Tu marcador anual de páginas leídas</h1>
           <p class="reading-era">Reading Era✨</p>
         </section>
 
@@ -60,7 +60,7 @@
                 <select id="yearSelect" aria-label="Seleccionar año"></select>
               </div>
               <div>
-                <p class="muted">Paginas totales</p>
+                <p class="muted">Páginas totales</p>
                 <p id="totalPages" class="metric">0</p>
               </div>
               <div>
@@ -74,7 +74,7 @@
               <p class="muted">Tus datos se guardan en este navegador.</p>
               <form id="bookForm" class="book-form" autocomplete="off">
                 <label class="suggestion-field">
-                  Titulo
+                  Título
                   <div class="suggestion-shell">
                     <input
                       id="titleInput"
@@ -102,12 +102,12 @@
                 </label>
 
                 <label>
-                  Fecha de finalizacion
+                  Fecha de finalización
                   <input id="finishedAtInput" name="finishedAt" type="date" required />
                 </label>
 
                 <label>
-                  Paginas (solo si no se encuentran automatico)
+                  Páginas (solo si no se encuentran automático)
                   <input
                     id="manualPagesInput"
                     name="manualPages"
@@ -138,7 +138,7 @@
         <section class="card reveal delay-1">
           <div class="list-header">
             <h2>Mis libros</h2>
-            <p class="muted">Ordenados por fecha de finalizacion</p>
+            <p class="muted">Ordenados por fecha de finalización</p>
           </div>
           <ul id="bookList" class="book-list"></ul>
         </section>
@@ -153,7 +153,7 @@
 
           <div class="dashboard-grid">
             <article class="dashboard-panel">
-              <h3>Paginas por mes</h3>
+              <h3>Páginas por mes</h3>
               <div id="pagesByMonthChart" class="dashboard-chart"></div>
             </article>
 
@@ -168,7 +168,7 @@
             </article>
 
             <article class="dashboard-panel">
-              <h3>Libros mas largos</h3>
+              <h3>Libros más largos</h3>
               <ul id="longestBooksList" class="dashboard-list"></ul>
             </article>
           </div>
