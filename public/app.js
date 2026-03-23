@@ -12,6 +12,12 @@ const bookList = document.getElementById('bookList');
 const recommendationList = document.getElementById('recommendationList');
 const homeView = document.getElementById('homeView');
 const booksView = document.getElementById('booksView');
+const dashboardView = document.getElementById('dashboardView');
+const dashboardYearLabel = document.getElementById('dashboardYearLabel');
+const pagesByMonthChart = document.getElementById('pagesByMonthChart');
+const booksByMonthChart = document.getElementById('booksByMonthChart');
+const topAuthorsList = document.getElementById('topAuthorsList');
+const longestBooksList = document.getElementById('longestBooksList');
 const menuToggle = document.getElementById('menuToggle');
 const menuClose = document.getElementById('menuClose');
 const navDrawer = document.getElementById('navDrawer');
@@ -851,12 +857,19 @@ function closeDrawer() {
 
 function setView(view) {
   const showHome = view === 'home';
+  const showBooks = view === 'books';
+  const showDashboard = view === 'dashboard';
   homeView.classList.toggle('is-hidden', !showHome);
-  booksView.classList.toggle('is-hidden', showHome);
+  booksView.classList.toggle('is-hidden', !showBooks);
+  dashboardView.classList.toggle('is-hidden', !showDashboard);
 
   drawerLinks.forEach((link) => {
     link.classList.toggle('is-active', link.dataset.view === view);
   });
+
+  if (showDashboard) {
+    renderDashboardView(Number(yearSelect.value));
+  }
 
   closeDrawer();
 }
@@ -1139,6 +1152,120 @@ function renderRecommendations(recommendations) {
   }
 }
 
+function renderHorizontalChart(container, values, formatter) {
+  container.innerHTML = '';
+  const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const maxValue = Math.max(...values, 0);
+
+  for (let index = 0; index < 12; index += 1) {
+    const row = document.createElement('div');
+    row.className = 'chart-row';
+
+    const label = document.createElement('span');
+    label.className = 'chart-label';
+    label.textContent = labels[index];
+
+    const track = document.createElement('div');
+    track.className = 'chart-track';
+
+    const fill = document.createElement('div');
+    fill.className = 'chart-fill';
+    const pct = maxValue > 0 ? (values[index] / maxValue) * 100 : 0;
+    fill.style.width = `${Math.max(4, pct)}%`;
+    if (values[index] === 0) {
+      fill.style.width = '0%';
+    }
+    track.append(fill);
+
+    const value = document.createElement('span');
+    value.className = 'chart-value';
+    value.textContent = formatter(values[index]);
+
+    row.append(label, track, value);
+    container.append(row);
+  }
+}
+
+function renderDashboardList(container, rows, emptyMessage, valueFormatter) {
+  container.innerHTML = '';
+
+  if (!rows || rows.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'empty-state';
+    empty.textContent = emptyMessage;
+    container.append(empty);
+    return;
+  }
+
+  rows.forEach((row) => {
+    const item = document.createElement('li');
+
+    const main = document.createElement('span');
+    main.className = 'dashboard-item-main';
+    main.textContent = row.label;
+
+    const meta = document.createElement('span');
+    meta.className = 'dashboard-item-meta';
+    meta.textContent = valueFormatter(row.value);
+
+    item.append(main, meta);
+    container.append(item);
+  });
+}
+
+function renderDashboardView(year = Number(yearSelect.value)) {
+  const books = getBooksForYear(year);
+  const monthlyPages = Array.from({ length: 12 }, () => 0);
+  const monthlyBooks = Array.from({ length: 12 }, () => 0);
+  const authorCounts = new Map();
+
+  for (const book of books) {
+    const date = new Date(book.finishedAt);
+    if (Number.isNaN(date.getTime())) {
+      continue;
+    }
+
+    const month = date.getMonth();
+    monthlyPages[month] += Number(book.pages) || 0;
+    monthlyBooks[month] += 1;
+
+    const author = normalizeText(book.author) || 'Autor no especificado';
+    authorCounts.set(author, (authorCounts.get(author) || 0) + 1);
+  }
+
+  dashboardYearLabel.textContent = `Año ${year}`;
+  renderHorizontalChart(pagesByMonthChart, monthlyPages, (value) => `${value}`);
+  renderHorizontalChart(booksByMonthChart, monthlyBooks, (value) => `${value}`);
+
+  const topAuthors = [...authorCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([author, count]) => ({ label: author, value: count }));
+
+  const longestBooks = books
+    .slice()
+    .sort((a, b) => (b.pages || 0) - (a.pages || 0))
+    .slice(0, 5)
+    .map((book) => ({
+      label: `${book.title} - ${book.author || 'Autor no especificado'}`,
+      value: book.pages || 0,
+    }));
+
+  renderDashboardList(
+    topAuthorsList,
+    topAuthors,
+    'Aun no hay datos para mostrar autores.',
+    (value) => `${value} libro${value === 1 ? '' : 's'}`
+  );
+
+  renderDashboardList(
+    longestBooksList,
+    longestBooks,
+    'Aun no hay libros para mostrar.',
+    (value) => `${value} pags`
+  );
+}
+
 async function refreshRecommendations() {
   try {
     const recommendations = await fetchRecommendations();
@@ -1155,6 +1282,7 @@ async function refreshDashboard(year = Number(yearSelect.value)) {
   totalPagesEl.textContent = String(summary.totalPages);
   bookCountEl.textContent = String(summary.booksRead);
   renderBooks(books);
+  renderDashboardView(year);
 }
 
 async function refreshAll(year = Number(yearSelect.value)) {
@@ -1273,7 +1401,13 @@ menuClose.addEventListener('click', closeDrawer);
 drawerBackdrop.addEventListener('click', closeDrawer);
 drawerLinks.forEach((link) => {
   link.addEventListener('click', () => {
-    setView(link.dataset.view === 'books' ? 'books' : 'home');
+    const targetView = link.dataset.view;
+    if (targetView === 'books' || targetView === 'dashboard' || targetView === 'home') {
+      setView(targetView);
+      return;
+    }
+
+    setView('home');
   });
 });
 document.addEventListener('keydown', (event) => {

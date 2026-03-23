@@ -30,6 +30,7 @@
       <nav class="drawer-nav">
         <button type="button" class="drawer-link is-active" data-view="home">Inicio</button>
         <button type="button" class="drawer-link" data-view="books">Mis libros</button>
+        <button type="button" class="drawer-link" data-view="dashboard">Dashboard</button>
       </nav>
     </aside>
     <div id="drawerBackdrop" class="drawer-backdrop"></div>
@@ -131,6 +132,37 @@
             <p class="muted">Ordenados por fecha de finalizacion</p>
           </div>
           <ul id="bookList" class="book-list"></ul>
+        </section>
+      </section>
+
+      <section id="dashboardView" class="app-view is-hidden">
+        <section class="card reveal delay-1">
+          <div class="list-header">
+            <h2>Dashboard de lectura</h2>
+            <p id="dashboardYearLabel" class="muted">Año actual</p>
+          </div>
+
+          <div class="dashboard-grid">
+            <article class="dashboard-panel">
+              <h3>Paginas por mes</h3>
+              <div id="pagesByMonthChart" class="dashboard-chart"></div>
+            </article>
+
+            <article class="dashboard-panel">
+              <h3>Libros por mes</h3>
+              <div id="booksByMonthChart" class="dashboard-chart"></div>
+            </article>
+
+            <article class="dashboard-panel">
+              <h3>Top autores</h3>
+              <ul id="topAuthorsList" class="dashboard-list"></ul>
+            </article>
+
+            <article class="dashboard-panel">
+              <h3>Libros mas largos</h3>
+              <ul id="longestBooksList" class="dashboard-list"></ul>
+            </article>
+          </div>
         </section>
       </section>
     </main>
