@@ -1165,38 +1165,257 @@ function renderRecommendations(recommendations) {
   }
 }
 
-function renderHorizontalChart(container, values, formatter) {
-  container.innerHTML = '';
-  const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const maxValue = Math.max(...values, 0);
+function createSvgNode(tagName, attrs = {}) {
+  const node = document.createElementNS('http://www.w3.org/2000/svg', tagName);
+  Object.entries(attrs).forEach(([key, value]) => {
+    node.setAttribute(key, String(value));
+  });
+  return node;
+}
 
-  for (let index = 0; index < 12; index += 1) {
-    const row = document.createElement('div');
-    row.className = 'chart-row';
-
-    const label = document.createElement('span');
-    label.className = 'chart-label';
-    label.textContent = labels[index];
-
-    const track = document.createElement('div');
-    track.className = 'chart-track';
-
-    const fill = document.createElement('div');
-    fill.className = 'chart-fill';
-    const pct = maxValue > 0 ? (values[index] / maxValue) * 100 : 0;
-    fill.style.width = `${Math.max(4, pct)}%`;
-    if (values[index] === 0) {
-      fill.style.width = '0%';
-    }
-    track.append(fill);
-
-    const value = document.createElement('span');
-    value.className = 'chart-value';
-    value.textContent = formatter(values[index]);
-
-    row.append(label, track, value);
-    container.append(row);
+function niceMax(value) {
+  if (value <= 0) {
+    return 10;
   }
+
+  const exponent = Math.floor(Math.log10(value));
+  const fraction = value / 10 ** exponent;
+  let rounded;
+
+  if (fraction <= 1) {
+    rounded = 1;
+  } else if (fraction <= 2) {
+    rounded = 2;
+  } else if (fraction <= 5) {
+    rounded = 5;
+  } else {
+    rounded = 10;
+  }
+
+  return rounded * 10 ** exponent;
+}
+
+function renderLineAreaChart(container, values, { lineColor, fillColor, valueSuffix }) {
+  container.innerHTML = '';
+  container.classList.add('pro-chart');
+
+  const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const width = 700;
+  const height = 270;
+  const padding = { top: 20, right: 16, bottom: 42, left: 38 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const highest = Math.max(...values, 0);
+  const yMax = niceMax(highest || 10);
+
+  const svg = createSvgNode('svg', {
+    viewBox: `0 0 ${width} ${height}`,
+    role: 'img',
+    'aria-label': 'Grafico de lineas mensual',
+    preserveAspectRatio: 'none',
+  });
+
+  const defs = createSvgNode('defs');
+  const gradient = createSvgNode('linearGradient', {
+    id: `areaGradient-${container.id}`,
+    x1: '0',
+    y1: '0',
+    x2: '0',
+    y2: '1',
+  });
+  gradient.append(
+    createSvgNode('stop', { offset: '0%', 'stop-color': fillColor, 'stop-opacity': '0.52' }),
+    createSvgNode('stop', { offset: '100%', 'stop-color': fillColor, 'stop-opacity': '0.02' })
+  );
+  defs.append(gradient);
+  svg.append(defs);
+
+  for (let line = 0; line <= 4; line += 1) {
+    const y = padding.top + (innerHeight / 4) * line;
+    const value = Math.round(yMax - (yMax / 4) * line);
+
+    svg.append(
+      createSvgNode('line', {
+        x1: padding.left,
+        y1: y,
+        x2: width - padding.right,
+        y2: y,
+        class: 'pro-grid-line',
+      })
+    );
+
+    svg.append(
+      createSvgNode('text', {
+        x: padding.left - 8,
+        y: y + 4,
+        'text-anchor': 'end',
+        class: 'pro-grid-label',
+      })
+    ).textContent = String(value);
+  }
+
+  const stepX = innerWidth / (values.length - 1);
+  const pointPath = values
+    .map((value, index) => {
+      const x = padding.left + stepX * index;
+      const y = padding.top + innerHeight - (value / yMax) * innerHeight;
+      return { x, y, value, label: labels[index] };
+    });
+
+  const lineD = pointPath
+    .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
+    .join(' ');
+
+  const areaD = `${lineD} L ${(padding.left + innerWidth).toFixed(2)} ${(padding.top + innerHeight).toFixed(2)} L ${padding.left.toFixed(2)} ${(padding.top + innerHeight).toFixed(2)} Z`;
+
+  svg.append(
+    createSvgNode('path', {
+      d: areaD,
+      fill: `url(#areaGradient-${container.id})`,
+      stroke: 'none',
+    })
+  );
+
+  svg.append(
+    createSvgNode('path', {
+      d: lineD,
+      fill: 'none',
+      stroke: lineColor,
+      'stroke-width': 3,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      class: 'pro-line-path',
+    })
+  );
+
+  pointPath.forEach((point) => {
+    const marker = createSvgNode('circle', {
+      cx: point.x,
+      cy: point.y,
+      r: 4.2,
+      fill: '#ffffff',
+      stroke: lineColor,
+      'stroke-width': 2,
+      class: 'pro-point',
+    });
+
+    const hint = createSvgNode('title');
+    hint.textContent = `${point.label}: ${point.value}${valueSuffix}`;
+    marker.append(hint);
+    svg.append(marker);
+  });
+
+  labels.forEach((label, index) => {
+    const x = padding.left + stepX * index;
+    svg.append(
+      createSvgNode('text', {
+        x,
+        y: height - 14,
+        'text-anchor': 'middle',
+        class: 'pro-axis-label',
+      })
+    ).textContent = label;
+  });
+
+  container.append(svg);
+}
+
+function renderBarChart(container, values, { barStart, barEnd, valueSuffix }) {
+  container.innerHTML = '';
+  container.classList.add('pro-chart');
+
+  const labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  const width = 700;
+  const height = 270;
+  const padding = { top: 20, right: 16, bottom: 42, left: 38 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+  const highest = Math.max(...values, 0);
+  const yMax = niceMax(highest || 10);
+
+  const svg = createSvgNode('svg', {
+    viewBox: `0 0 ${width} ${height}`,
+    role: 'img',
+    'aria-label': 'Grafico de barras mensual',
+    preserveAspectRatio: 'none',
+  });
+
+  const gradientId = `barGradient-${container.id}`;
+  const defs = createSvgNode('defs');
+  const gradient = createSvgNode('linearGradient', {
+    id: gradientId,
+    x1: '0',
+    y1: '0',
+    x2: '0',
+    y2: '1',
+  });
+  gradient.append(
+    createSvgNode('stop', { offset: '0%', 'stop-color': barStart }),
+    createSvgNode('stop', { offset: '100%', 'stop-color': barEnd })
+  );
+  defs.append(gradient);
+  svg.append(defs);
+
+  for (let line = 0; line <= 4; line += 1) {
+    const y = padding.top + (innerHeight / 4) * line;
+    const value = Math.round(yMax - (yMax / 4) * line);
+
+    svg.append(
+      createSvgNode('line', {
+        x1: padding.left,
+        y1: y,
+        x2: width - padding.right,
+        y2: y,
+        class: 'pro-grid-line',
+      })
+    );
+
+    svg.append(
+      createSvgNode('text', {
+        x: padding.left - 8,
+        y: y + 4,
+        'text-anchor': 'end',
+        class: 'pro-grid-label',
+      })
+    ).textContent = String(value);
+  }
+
+  const barGroupWidth = innerWidth / values.length;
+  const barWidth = Math.min(34, Math.max(16, barGroupWidth * 0.55));
+
+  values.forEach((value, index) => {
+    const xCenter = padding.left + barGroupWidth * index + barGroupWidth / 2;
+    const heightValue = (value / yMax) * innerHeight;
+    const barHeight = Math.max(0, heightValue);
+    const x = xCenter - barWidth / 2;
+    const y = padding.top + innerHeight - barHeight;
+
+    const bar = createSvgNode('rect', {
+      x,
+      y,
+      width: barWidth,
+      height: barHeight,
+      rx: 8,
+      fill: `url(#${gradientId})`,
+      class: 'pro-bar',
+    });
+
+    const hint = createSvgNode('title');
+    hint.textContent = `${labels[index]}: ${value}${valueSuffix}`;
+    bar.append(hint);
+    svg.append(bar);
+
+    svg.append(
+      createSvgNode('text', {
+        x: xCenter,
+        y: height - 14,
+        'text-anchor': 'middle',
+        class: 'pro-axis-label',
+      })
+    ).textContent = labels[index];
+  });
+
+  container.append(svg);
 }
 
 function renderDashboardList(container, rows, emptyMessage, valueFormatter) {
@@ -1247,8 +1466,16 @@ function renderDashboardView(year = Number(yearSelect.value)) {
   }
 
   dashboardYearLabel.textContent = `Año ${year}`;
-  renderHorizontalChart(pagesByMonthChart, monthlyPages, (value) => `${value}`);
-  renderHorizontalChart(booksByMonthChart, monthlyBooks, (value) => `${value}`);
+  renderLineAreaChart(pagesByMonthChart, monthlyPages, {
+    lineColor: '#de4a7d',
+    fillColor: '#f49dbc',
+    valueSuffix: ' pags',
+  });
+  renderBarChart(booksByMonthChart, monthlyBooks, {
+    barStart: '#f08fb0',
+    barEnd: '#dc4a7b',
+    valueSuffix: ' libros',
+  });
 
   const topAuthors = [...authorCounts.entries()]
     .sort((a, b) => b[1] - a[1])
