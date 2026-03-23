@@ -229,9 +229,7 @@ function getClientBooks(store, activeClientId) {
 function getBooksForYear(year) {
   const store = readStore();
   const books = getClientBooks(store, clientId);
-  return books
-    .filter((book) => book.year === year)
-    .sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt));
+  return books.filter((book) => book.year === year);
 }
 
 function getSummaryForYear(year) {
@@ -1085,7 +1083,15 @@ function deleteBook(bookId) {
 function renderBooks(books) {
   bookList.innerHTML = '';
 
-  if (books.length === 0) {
+  const orderedBooks = books
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || b.finishedAt || 0).getTime() -
+        new Date(a.createdAt || a.finishedAt || 0).getTime()
+    );
+
+  if (orderedBooks.length === 0) {
     const empty = document.createElement('li');
     empty.className = 'empty-state';
     empty.textContent = 'Todavia no registraste libros para este año.';
@@ -1093,7 +1099,7 @@ function renderBooks(books) {
     return;
   }
 
-  for (const book of books) {
+  for (const book of orderedBooks) {
     const item = document.createElement('li');
     item.className = 'book-item';
 
