@@ -510,8 +510,7 @@ async function fetchSuggestions(query, signal) {
 
   const allItems = batches.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
 
-  const ranked = uniqueBy(
-    allItems
+  const rankedItems = allItems
       .filter((item) => item.title)
       .filter((item) => !isNoisyCandidate(item, { strict: true }))
       .map((item) => ({
@@ -527,7 +526,6 @@ async function fetchSuggestions(query, signal) {
           scoreMatch(item, { title: query, author: '' }) +
           (normalizeKey(item.title).includes(normalizeKey(query)) ? 2 : 0),
       }))
-      .filter((item) => item.relevance > 0 || item.tokenMatches >= 2)
       .map((item) => ({
         ...item,
         relevance:
@@ -540,7 +538,14 @@ async function fetchSuggestions(query, signal) {
           item.editionWeight +
           item.recencyWeight,
       }))
-      .sort((a, b) => b.relevance - a.relevance),
+      .sort((a, b) => b.relevance - a.relevance);
+
+  const broadFallback = rankedItems
+    .filter((item) => item.relevance > 0 || item.tokenMatches >= 1)
+    .sort((a, b) => b.relevance - a.relevance);
+
+  const ranked = uniqueBy(
+    (broadFallback.length > 0 ? broadFallback : rankedItems),
     (item) => `${normalizeKey(item.title)}::${normalizeKey(item.author)}`
   );
 
@@ -968,6 +973,7 @@ function onTitleInput() {
 
   if (suggestionController) {
     suggestionController.abort();
+    suggestionController = null;
   }
 
   const query = titleInput.value.trim();
@@ -978,11 +984,15 @@ function onTitleInput() {
   }
 
   const requestQuery = query;
-  suggestionController = new AbortController();
+  const controller = new AbortController();
+  suggestionController = controller;
 
   suggestionTimer = setTimeout(async () => {
     try {
-      const suggestions = await fetchSuggestions(requestQuery, suggestionController.signal);
+      const suggestions = await fetchSuggestions(requestQuery, controller.signal);
+      if (controller !== suggestionController) {
+        return;
+      }
       if (titleInput.value.trim() !== requestQuery) {
         return;
       }
@@ -991,7 +1001,14 @@ function onTitleInput() {
       if (error && error.name === 'AbortError') {
         return;
       }
+      if (controller !== suggestionController) {
+        return;
+      }
       renderSuggestions([]);
+    } finally {
+      if (controller === suggestionController) {
+        suggestionController = null;
+      }
     }
   }, 160);
 }
