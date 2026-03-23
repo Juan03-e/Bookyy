@@ -855,20 +855,33 @@ function closeDrawer() {
   navDrawer.setAttribute('aria-hidden', 'true');
 }
 
+function normalizeView(value) {
+  const raw = normalizeText(value).toLowerCase();
+  if (raw === 'home' || raw === 'books' || raw === 'dashboard') {
+    return raw;
+  }
+  return 'home';
+}
+
 function setView(view) {
-  const showHome = view === 'home';
-  const showBooks = view === 'books';
-  const showDashboard = view === 'dashboard';
+  const nextView = normalizeView(view);
+  const showHome = nextView === 'home';
+  const showBooks = nextView === 'books';
+  const showDashboard = nextView === 'dashboard';
   homeView.classList.toggle('is-hidden', !showHome);
   booksView.classList.toggle('is-hidden', !showBooks);
   dashboardView.classList.toggle('is-hidden', !showDashboard);
 
   drawerLinks.forEach((link) => {
-    link.classList.toggle('is-active', link.dataset.view === view);
+    link.classList.toggle('is-active', normalizeView(link.dataset.view) === nextView);
   });
 
   if (showDashboard) {
-    renderDashboardView(Number(yearSelect.value));
+    try {
+      renderDashboardView(Number(yearSelect.value));
+    } catch {
+      setMessage('No se pudo abrir el dashboard. Recarga la pagina.', true);
+    }
   }
 
   closeDrawer();
@@ -1400,14 +1413,9 @@ menuToggle.addEventListener('click', openDrawer);
 menuClose.addEventListener('click', closeDrawer);
 drawerBackdrop.addEventListener('click', closeDrawer);
 drawerLinks.forEach((link) => {
-  link.addEventListener('click', () => {
-    const targetView = link.dataset.view;
-    if (targetView === 'books' || targetView === 'dashboard' || targetView === 'home') {
-      setView(targetView);
-      return;
-    }
-
-    setView('home');
+  link.addEventListener('click', (event) => {
+    const targetView = event.currentTarget?.dataset?.view;
+    setView(targetView);
   });
 });
 document.addEventListener('keydown', (event) => {
