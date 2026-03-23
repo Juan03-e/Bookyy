@@ -1244,14 +1244,14 @@ function renderLineAreaChart(container, values, { lineColor, fillColor, valueSuf
       })
     );
 
-    svg.append(
-      createSvgNode('text', {
-        x: padding.left - 8,
-        y: y + 4,
-        'text-anchor': 'end',
-        class: 'pro-grid-label',
-      })
-    ).textContent = String(value);
+    const yLabel = createSvgNode('text', {
+      x: padding.left - 8,
+      y: y + 4,
+      'text-anchor': 'end',
+      class: 'pro-grid-label',
+    });
+    yLabel.textContent = String(value);
+    svg.append(yLabel);
   }
 
   const stepX = innerWidth / (values.length - 1);
@@ -1307,14 +1307,14 @@ function renderLineAreaChart(container, values, { lineColor, fillColor, valueSuf
 
   labels.forEach((label, index) => {
     const x = padding.left + stepX * index;
-    svg.append(
-      createSvgNode('text', {
-        x,
-        y: height - 14,
-        'text-anchor': 'middle',
-        class: 'pro-axis-label',
-      })
-    ).textContent = label;
+    const xLabel = createSvgNode('text', {
+      x,
+      y: height - 14,
+      'text-anchor': 'middle',
+      class: 'pro-axis-label',
+    });
+    xLabel.textContent = label;
+    svg.append(xLabel);
   });
 
   container.append(svg);
@@ -1370,14 +1370,14 @@ function renderBarChart(container, values, { barStart, barEnd, valueSuffix }) {
       })
     );
 
-    svg.append(
-      createSvgNode('text', {
-        x: padding.left - 8,
-        y: y + 4,
-        'text-anchor': 'end',
-        class: 'pro-grid-label',
-      })
-    ).textContent = String(value);
+    const yLabel = createSvgNode('text', {
+      x: padding.left - 8,
+      y: y + 4,
+      'text-anchor': 'end',
+      class: 'pro-grid-label',
+    });
+    yLabel.textContent = String(value);
+    svg.append(yLabel);
   }
 
   const barGroupWidth = innerWidth / values.length;
@@ -1405,14 +1405,14 @@ function renderBarChart(container, values, { barStart, barEnd, valueSuffix }) {
     bar.append(hint);
     svg.append(bar);
 
-    svg.append(
-      createSvgNode('text', {
-        x: xCenter,
-        y: height - 14,
-        'text-anchor': 'middle',
-        class: 'pro-axis-label',
-      })
-    ).textContent = labels[index];
+    const xLabel = createSvgNode('text', {
+      x: xCenter,
+      y: height - 14,
+      'text-anchor': 'middle',
+      class: 'pro-axis-label',
+    });
+    xLabel.textContent = labels[index];
+    svg.append(xLabel);
   });
 
   container.append(svg);
